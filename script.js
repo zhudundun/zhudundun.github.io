@@ -21,9 +21,16 @@ d3.tsv("state_market_tracker.tsv").then(data => {
         d.homes_sold = +d.homes_sold;
     });
 
+ // Group data by period and calculate median homes_sold
+ const dataByPeriod = d3.group(data, d => d.period_begin);
+ const medianData = Array.from(dataByPeriod, ([period, values]) => {
+     const medianHomesSold = d3.median(values, d => d.homes_sold);
+     return { period_begin: period, homes_sold: medianHomesSold };
+ });
+
     // X axis
     const x = d3.scaleTime()
-        .domain(d3.extent(data, d => d.period_begin))
+        .domain(d3.extent(medianData, d => d.period_begin))
         .range([0, width]);
     svg.append("g")
         .attr("transform", `translate(0,${height})`)
@@ -31,7 +38,7 @@ d3.tsv("state_market_tracker.tsv").then(data => {
 
     // Y axis
     const y = d3.scaleLinear()
-        .domain([0, d3.max(data, d => d.homes_sold)])
+        .domain([0, d3.max(medianData, d => d.homes_sold)])
         .range([height, 0]);
     svg.append("g")
         .call(d3.axisLeft(y));
@@ -43,22 +50,22 @@ d3.tsv("state_market_tracker.tsv").then(data => {
 
     // Append the path
     svg.append("path")
-        .datum(data)
+        .datum(medianData)
         .attr("fill", "none")
         .attr("stroke", "#69b3a2")
         .attr("stroke-width", 1.5)
         .attr("d", line);
 
     // Annotations (optional)
-    const highestValueIndex = d3.scan(data, (a, b) => b.homes_sold - a.homes_sold);
+    const highestValueIndex = d3.scan(medianData, (a, b) => b.homes_sold - a.homes_sold);
     const annotations = [
         {
             note: {
                 label: "Highest Homes Sold",
-                title: d3.timeFormat("%b %Y")(data[highestValueIndex].period_begin)
+                title: d3.timeFormat("%b %Y")(medianData[highestValueIndex].period_begin)
             },
-            x: x(data[highestValueIndex].period_begin),
-            y: y(d3.max(data, d => d.homes_sold)),
+            x: x(medianData[highestValueIndex].period_begin),
+            y: y(d3.max(medianData, d => d.homes_sold)),
             dy: -30,
             dx: 50
         }
