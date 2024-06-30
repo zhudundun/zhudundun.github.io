@@ -11,41 +11,54 @@ const svg = d3.select("#chart")
     .append("g")
     .attr("transform", `translate(${margin.left},${margin.top})`);
 
+
 // Load data
-d3.json("data.json").then(data => {
+d3.tsv("state_market_tracker.tsv").then(data => {
+    // Parse the date and convert homes_sold to number
+    const parseDate = d3.timeParse("%Y-%m-%d");
+    data.forEach(d => {
+        d.period_begin = parseDate(d.period_begin);
+        d.homes_sold = +d.homes_sold;
+    });
+
     // X axis
-    const x = d3.scaleBand()
-        .range([0, width])
-        .domain(data.map(d => d.name))
-        .padding(0.2);
+    const x = d3.scaleTime()
+        .domain(d3.extent(data, d => d.period_begin))
+        .range([0, width]);
     svg.append("g")
         .attr("transform", `translate(0,${height})`)
-        .call(d3.axisBottom(x));
+        .call(d3.axisBottom(x).tickFormat(d3.timeFormat("%b %Y")));
 
-    // Add Y axis
+    // Y axis
     const y = d3.scaleLinear()
-        .domain([0, 100])
+        .domain([0, d3.max(data, d => d.homes_sold)])
         .range([height, 0]);
     svg.append("g")
         .call(d3.axisLeft(y));
 
-    // Bars
-    svg.selectAll("mybar")
-        .data(data)
-        .enter()
-        .append("rect")
-        .attr("x", d => x(d.name))
-        .attr("y", d => y(d.value))
-        .attr("width", x.bandwidth())
-        .attr("height", d => height - y(d.value))
-        .attr("fill", "#69b3a2");
+    // Line generator
+    const line = d3.line()
+        .x(d => x(d.period_begin))
+        .y(d => y(d.homes_sold));
 
-    // Annotations
+    // Append the path
+    svg.append("path")
+        .datum(data)
+        .attr("fill", "none")
+        .attr("stroke", "#69b3a2")
+        .attr("stroke-width", 1.5)
+        .attr("d", line);
+
+    // Annotations (optional)
+    const highestValueIndex = d3.scan(data, (a, b) => b.homes_sold - a.homes_sold);
     const annotations = [
         {
-            note: {label: "Highest Value", title: "F"},
-            x: x("F") + x.bandwidth() / 2,
-            y: y(90),
+            note: {
+                label: "Highest Homes Sold",
+                title: d3.timeFormat("%b %Y")(data[highestValueIndex].period_begin)
+            },
+            x: x(data[highestValueIndex].period_begin),
+            y: y(d3.max(data, d => d.homes_sold)),
             dy: -30,
             dx: 50
         }
@@ -57,3 +70,5 @@ d3.json("data.json").then(data => {
     svg.append("g")
         .call(makeAnnotations);
 });
+
+
