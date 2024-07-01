@@ -8,6 +8,22 @@
 </head>
 <body>
     <div id="chart"></div>
+    <label for="state-select">Choose a state:</label>
+    <select id="state-select">
+        <option value="all">All States</option>
+        <option value="California">California</option>
+        <option value="New York">New York</option>
+        <!-- Add more states as needed -->
+    </select>
+    <div id="year-checkboxes">
+        <label><input type="checkbox" value="2020">2020</label>
+        <label><input type="checkbox" value="2021">2021</label>
+        <label><input type="checkbox" value="2022">2022</label>
+        <label><input type="checkbox" value="2022">2023</label>
+        <label><input type="checkbox" value="2022">2024</label>
+
+        <!-- Add other years as needed -->
+    </div>
     <script src="https://d3js.org/d3.v7.min.js"></script>
     <script src="https://unpkg.com/d3-annotation@2.5.1/dist/d3-annotation.min.js"></script>
     <script src="https://d3js.org/topojson.v3.min.js"></script>
