@@ -4,10 +4,10 @@ document.addEventListener("DOMContentLoaded", function() {
 	const margin = {
 			top: 20,
 			right: 30,
-			bottom: 40,
+			bottom: 60,
 			left: 40
 		},
-		width = 800 - margin.left - margin.right,
+		width = 1200 - margin.left - margin.right,
 		height = 600 - margin.top - margin.bottom;
 
 	// Append the svg object to the body of the page
@@ -17,6 +17,19 @@ document.addEventListener("DOMContentLoaded", function() {
 		.attr("height", height + margin.top + margin.bottom)
 		.append("g")
 		.attr("transform", `translate(${margin.left},${margin.top})`);
+
+    // Append a group element to hold the chart contents
+    const chartGroup = svg.append("g")
+    .attr("transform", `translate(${margin.left},${margin.top})`);
+
+    // Add a title to the chart
+    svg.append("text")
+    .attr("x", (width / 2))             
+    .attr("y", 0)
+    .attr("text-anchor", "middle")  
+    .style("font-size", "24px") 
+    .text("Post Pandemic Era Housing Market");
+
 
 	// Append a tooltip div to the body
 	const tooltip = d3.select("body")
@@ -40,6 +53,9 @@ document.addEventListener("DOMContentLoaded", function() {
 		data.forEach(d => {
 			d.period_begin = parseDate(d.period_begin);
 			d.homes_sold = +d.homes_sold;
+
+            d.month = d.period_begin.getMonth(); // Extract month
+
 		});
 
 		// Sort data by period_begin
@@ -73,7 +89,7 @@ document.addEventListener("DOMContentLoaded", function() {
 		}
 
 		// Clear previous SVG contents
-		svg.selectAll("*").remove();
+		chartGroup.selectAll("*").remove();
 
 
 
@@ -84,7 +100,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
         const medianDataArray = [];
 
-
+        let count = 0;
         years.forEach(year => {
 			const yearData = filteredData.filter(d => d.period_begin.getFullYear() === year);
             console.log(`filteredData count for year ${year}:`, yearData.length);
@@ -110,68 +126,94 @@ document.addEventListener("DOMContentLoaded", function() {
             console.log(`filteredData count for year ${year}:`, yearData.length);
 
 			// Group data by period and calculate median homes_sold
-			const dataByPeriod = d3.group(yearData, d => d.period_begin);
-			const medianData = Array.from(dataByPeriod, ([period, values]) => {
+            const dataByMonth = d3.group(yearData, d => d.month);
+
+
+			const medianData = Array.from(dataByMonth, ([month, values]) => {
 				const medianHomesSold = d3.median(values, d => d.homes_sold);
-				return {
-					period_begin: period,
-					homes_sold: medianHomesSold
-				};
+
+                return { 
+					month: new Date(year, month), 
+					homes_sold: medianHomesSold 
+				}; // Use a constant year for x-axis
+       
 			});
 
 
             // X axis
             const x = d3.scaleTime()
-                .domain(d3.extent(filteredData, d => d.period_begin))
-                .range([0, width]);
+                .domain([new Date(year, 0), new Date(year, 11)])
+                .range([0, width-40]);
 
-
-            svg.append("g")
+            if ( count == 0 )
+            {
+                chartGroup.append("g")
                 .attr("transform", `translate(0,${height})`)
-                .call(d3.axisBottom(x).tickValues([]));
-
+                .call(d3.axisBottom(x)
+                      .tickFormat(d3.timeFormat("%B"))  // Format ticks to show full month names
+                      .ticks(d3.timeMonth.every(1)));
+            }
+            count++;
 
 
             // Y axis
             
             const y = d3.scaleLinear()
-                // .domain([0, d3.max(filteredData, d => d.homes_sold)])
                 .domain([0, maxMedianHomesSold])
                 .range([height, 0]);
-            svg.append("g")
+            chartGroup.append("g")
                 .call(d3.axisLeft(y));
+
+            // Add y-axis label
+            chartGroup.append("text")
+            .attr("transform", "rotate(-90)")
+            .attr("y", 0 - 1.5*margin.left)
+            .attr("x", 0 - (height / 2))
+            .attr("dy", "1em")
+            .style("text-anchor", "middle")
+            .style("font-size", "16px")
+            .text("Median Homes Sold");
+
+            chartGroup.append("text")
+            .attr("x", width / 2)
+            .attr("y", height + margin.bottom - 20)
+            .attr("text-anchor", "middle")
+            .style("font-size", "16px")
+            .text("Month");
+
+
 
 
 			// Line generator
 			const line = d3.line()
-				.x(d => x(d.period_begin))
-				.y(d => y(d.homes_sold));
+				.x(d => x(d.month))
+                .y(d => y(d.homes_sold));
 
 
 			// Append the path
-			svg.append("path")
+			chartGroup.append("path")
 				.datum(medianData)
 				.attr("fill", "none")
-				.attr("stroke", "#69b3a2")
-				.attr("stroke-width", 1.5)
+				.attr("stroke", color(year))
+				.attr("stroke-width", 2)
 				.attr("d", line);
 
 			// Append circles to each data point
-			svg.selectAll(`.data-point-${year}`)
+			chartGroup.selectAll(`.data-point-${year}`)
 				.data(medianData)
 				.enter()
 				.append("circle")
 				.attr("class", `data-point-${year}`)
-				.attr("cx", d => x(d.period_begin))
-				.attr("cy", d => y(d.homes_sold))
+				.attr("cx", d => x(d.month))
+                .attr("cy", d => y(d.homes_sold))
 				.attr("r", 4)
 				.attr("fill", color(year))
 				.on("mouseover", (event, d) => {
 					tooltip.transition()
 						.duration(200)
 						.style("opacity", .9);
-					tooltip.html(`Date: ${d3.timeFormat("%b %d, %Y")(d.period_begin)}<br>Median Homes Sold: ${d.homes_sold}`)
-						.style("left", (event.pageX + 5) + "px")
+					tooltip.html(`Date: ${d3.timeFormat("%b %d, %Y")(d.month)}<br>Median Homes Sold: ${d.homes_sold}`)
+                        .style("left", (event.pageX + 5) + "px")
 						.style("top", (event.pageY - 28) + "px");
 				})
 				.on("mouseout", () => {
