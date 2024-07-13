@@ -53,7 +53,7 @@ document.addEventListener("DOMContentLoaded", function() {
 		data.forEach(d => {
 			d.period_begin = parseDate(d.period_begin);
 			d.homes_sold = +d.homes_sold;
-
+			d.off_market_in_two_weeks = +d.off_market_in_two_weeks;
             d.month = d.period_begin.getMonth(); // Extract month
 
 		});
@@ -66,17 +66,29 @@ document.addEventListener("DOMContentLoaded", function() {
 
 	});
 
+	// Event listener for plot buttons
+    document.querySelectorAll('.plot-btn').forEach(button => {
+        button.addEventListener('click', function() {
+			document.querySelectorAll('.plot-btn').forEach(btn => btn.classList.remove('selected'));
+            this.classList.add('selected');
+            const column = this.getAttribute('data-column');
+			console.log("Selected button data column:", column); // Print the selected button's data column
+            updateGraph("all", [], column); // Initial state as "all" and no year filter
+        });
+    });
+
 	document.getElementById("submit-btn").addEventListener("click", function() {
 		const selectedState = document.getElementById("state-select").value;
 		const selectedYears = Array.from(document.querySelectorAll('#year-checkboxes input:checked')).map(cb => +cb.value);
-		updateGraph(selectedState, selectedYears);
+		const column = document.querySelector('.plot-btn.selected').getAttribute('data-column'); // Get the selected column
+		updateGraph(selectedState, selectedYears, column);
 	});
 
 	// Function to update the graph based on selected state
-	function updateGraph(state, years) {
+	function updateGraph(state, years, column) {
 		let filteredData = allData;
 
-        console.log("Initial filteredData count:", filteredData.length);
+        // console.log("Initial filteredData count:", filteredData.length);
 
 
 
@@ -108,16 +120,16 @@ document.addEventListener("DOMContentLoaded", function() {
 			// Group data by period and calculate median homes_sold
 			const dataByPeriod = d3.group(yearData, d => d.period_begin);
 			const medianData = Array.from(dataByPeriod, ([period, values]) => {
-				const medianHomesSold = d3.median(values, d => d.homes_sold);
+				const medianValue = d3.median(values, d => d[column]);
 				return {
 					period_begin: period,
-					homes_sold: medianHomesSold
+					value: medianValue
 				};
 			});
 
             medianDataArray.push(...medianData);
         })
-        const maxMedianHomesSold = d3.max(medianDataArray, d => d.homes_sold);
+        const maxMedianValue = d3.max(medianDataArray, d => d.value);
 
 
 
@@ -130,11 +142,11 @@ document.addEventListener("DOMContentLoaded", function() {
 
 
 			const medianData = Array.from(dataByMonth, ([month, values]) => {
-				const medianHomesSold = d3.median(values, d => d.homes_sold);
+				const medianValue = d3.median(values, d => d[column]);
 
                 return { 
 					month: new Date(year, month), 
-					homes_sold: medianHomesSold 
+					value: medianValue 
 				}; // Use a constant year for x-axis
        
 			});
@@ -159,7 +171,7 @@ document.addEventListener("DOMContentLoaded", function() {
             // Y axis
             
             const y = d3.scaleLinear()
-                .domain([0, maxMedianHomesSold])
+                .domain([0, maxMedianValue])
                 .range([height, 0]);
             chartGroup.append("g")
                 .call(d3.axisLeft(y));
@@ -172,7 +184,7 @@ document.addEventListener("DOMContentLoaded", function() {
             .attr("dy", "1em")
             .style("text-anchor", "middle")
             .style("font-size", "16px")
-            .text("Median Homes Sold");
+            .text(`Median ${column.replace('_', ' ')}`);
 
             chartGroup.append("text")
             .attr("x", width / 2)
@@ -187,7 +199,7 @@ document.addEventListener("DOMContentLoaded", function() {
 			// Line generator
 			const line = d3.line()
 				.x(d => x(d.month))
-                .y(d => y(d.homes_sold));
+                .y(d => y(d.value));
 
 
 			// Append the path
@@ -205,14 +217,14 @@ document.addEventListener("DOMContentLoaded", function() {
 				.append("circle")
 				.attr("class", `data-point-${year}`)
 				.attr("cx", d => x(d.month))
-                .attr("cy", d => y(d.homes_sold))
+                .attr("cy", d => y(d.value))
 				.attr("r", 4)
 				.attr("fill", color(year))
 				.on("mouseover", (event, d) => {
 					tooltip.transition()
 						.duration(200)
 						.style("opacity", .9);
-					tooltip.html(`Date: ${d3.timeFormat("%b %d, %Y")(d.month)}<br>Median Homes Sold: ${d.homes_sold}`)
+					tooltip.html(`Date: ${d3.timeFormat("%b %d, %Y")(d.month)}<br>Median ${column.replace('_', ' ')}: ${d.value}`)
                         .style("left", (event.pageX + 5) + "px")
 						.style("top", (event.pageY - 28) + "px");
 				})
@@ -249,7 +261,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
 	}
 	// Initial graph with all states
-	updateGraph("all", []);
+	updateGraph("all", [], "homes_sold");
 
 
 });
