@@ -225,6 +225,28 @@ document.addEventListener("DOMContentLoaded", function() {
 
 		});
 
+	// Add legend
+	const legend = chartGroup.append("g")
+		.attr("class", "legend")
+		.attr("transform", `translate(${margin.left-400}, ${margin.top -20})`)
+		.selectAll("g")
+		.data(years)
+		.enter().append("g")
+		.attr("transform", (d, i) => `translate(${i * 80},0)`);
+
+	legend.append("rect")
+		.attr("x", width - 18)
+		.attr("width", 18)
+		.attr("height", 18)
+		.attr("fill", color);
+
+	legend.append("text")
+		.attr("x", width - 24)
+		.attr("y", 9)
+		.attr("dy", "0.35em")
+		.attr("text-anchor", "end")
+		.text(d => d);
+
 	}
 	// Initial graph with all states
 	updateGraph("all", []);
