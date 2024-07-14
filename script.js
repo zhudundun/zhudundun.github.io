@@ -132,7 +132,6 @@ document.addEventListener("DOMContentLoaded", function() {
         const maxMedianValue = d3.max(medianDataArray, d => d.value);
 
 
-
 		years.forEach(year => {
 			const yearData = filteredData.filter(d => d.period_begin.getFullYear() === year);
             console.log(`filteredData count for year ${year}:`, yearData.length);
@@ -151,21 +150,28 @@ document.addEventListener("DOMContentLoaded", function() {
        
 			});
 
+			// X axis
+			const x = d3.scaleTime().range([0, width-40]);
+			if (column === "homes_sold") {
+                x.domain([new Date(year, 0), new Date(year, 11)]);
 
-            // X axis
-            const x = d3.scaleTime()
-                .domain([new Date(year, 0), new Date(year, 11)])
-                .range([0, width-40]);
+				if ( count == 0 )
+				{
+					chartGroup.append("g")
+					.attr("transform", `translate(0,${height})`)
+					.call(d3.axisBottom(x)
+						  .tickFormat(d3.timeFormat("%B"))  // Format ticks to show full month names
+						  .ticks(d3.timeMonth.every(1)));
+				}
+				count++;
+			} else {
+				x.domain(d3.extent(filteredData, d => d.period_begin));
+				chartGroup.append("g")
+					.attr("transform", `translate(0,${height})`)
+					.call(d3.axisBottom(x).tickValues([]));
+			}
 
-            if ( count == 0 )
-            {
-                chartGroup.append("g")
-                .attr("transform", `translate(0,${height})`)
-                .call(d3.axisBottom(x)
-                      .tickFormat(d3.timeFormat("%B"))  // Format ticks to show full month names
-                      .ticks(d3.timeMonth.every(1)));
-            }
-            count++;
+           
 
 
             // Y axis

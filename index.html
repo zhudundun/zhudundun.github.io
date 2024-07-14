@@ -5,12 +5,45 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>D3 Visualization</title>
     <link rel="stylesheet" href="style.css">
+
+    <style>
+        /* Add your CSS styles here */
+        #chart {
+            margin-top: 10px;
+        }
+        .legend rect {
+            stroke-width: 2;
+            stroke: black;
+        }
+        .button-container {
+            margin-bottom: 20px;
+        }
+        .plot-btn {
+            background-color: #f0f0f0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            padding: 5px 10px;
+            margin: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s, box-shadow 0.3s;
+        }
+        .plot-btn:hover {
+            background-color: #e0e0e0;
+        }
+        .plot-btn.selected {
+            background-color: #007bff;
+            color: white;
+            border: 1px solid #007bff;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+        }
+    </style>
     
 </head>
 <body>
     <div class="button-container">
         <button class="plot-btn" data-column="homes_sold">Number of Homes Sold</button>
-        <button class="plot-btn" data-column="off_market_in_two_weeks">Off Market in 2 Weeks</button>
+        <button class="plot-btn" data-column="median_dom">Median Days on Market</button>
+        <button class="plot-btn" data-column="median_sale_price">Median Sale Price</button>
     </div>
 
     <div id="chart"></div>
@@ -69,6 +102,24 @@
         <option value="Wyoming">Wyoming</option>
         <!-- Add more states as needed -->
     </select>
+
+    <div>
+        <label for="home-type-select">Select Home Type:</label>
+        <select id="home-type-select">
+            <option value="all">All Types</option>
+            <option value="Single Family">Single Family</option>
+            <option value="Condo/Co-op">Condo/Co-op</option>
+            <option value="Multi-Family (2-4 Unit)">Multi-Family (2-4 Unit)</option>
+            <option value="Single Family Residential">Single Family Residential</option>
+            <option value="Townhouse">Townhouse</option>
+            <option value="Single Units Only">Single Units Only</option>
+
+
+
+            <!-- Add other home types here -->
+        </select>
+    </div>
+
     <div id="year-checkboxes">
         <label><input type="checkbox" value="2020">2020</label>
         <label><input type="checkbox" value="2021">2021</label>
