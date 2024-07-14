@@ -73,19 +73,20 @@ document.addEventListener("DOMContentLoaded", function() {
             this.classList.add('selected');
             const column = this.getAttribute('data-column');
 			console.log("Selected button data column:", column); // Print the selected button's data column
-            updateGraph("all", [], column); // Initial state as "all" and no year filter
+            updateGraph("all","all", [], column); // Initial state as "all" and no year filter
         });
     });
 
 	document.getElementById("submit-btn").addEventListener("click", function() {
 		const selectedState = document.getElementById("state-select").value;
+		const selectedHome = document.getElementById("home-type-select").value;
 		const selectedYears = Array.from(document.querySelectorAll('#year-checkboxes input:checked')).map(cb => +cb.value);
 		const column = document.querySelector('.plot-btn.selected').getAttribute('data-column'); // Get the selected column
-		updateGraph(selectedState, selectedYears, column);
+		updateGraph(selectedState, selectedHome, selectedYears, column);
 	});
 
 	// Function to update the graph based on selected state
-	function updateGraph(state, years, column) {
+	function updateGraph(state, home_type, years, column) {
 		let filteredData = allData;
 
         // console.log("Initial filteredData count:", filteredData.length);
@@ -95,6 +96,10 @@ document.addEventListener("DOMContentLoaded", function() {
 		if (state !== "all") {
 			filteredData = filteredData.filter(d => d.state === state);
 		}
+		if (home_type !== "all") {
+			filteredData = filteredData.filter(d => d.property_type === home_type);
+		}
+
 
 		if (years.length > 0) {
 			filteredData = filteredData.filter(d => years.includes(d.period_begin.getFullYear()));
@@ -267,7 +272,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
 	}
 	// Initial graph with all states
-	updateGraph("all", [], "homes_sold");
+	updateGraph("all", "all", [], "homes_sold");
 
 
 });
