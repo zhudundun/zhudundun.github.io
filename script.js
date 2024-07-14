@@ -74,7 +74,8 @@ document.addEventListener("DOMContentLoaded", function() {
             const column = this.getAttribute('data-column');
 			const yoy = document.querySelector('#toggle-sequence').classList.contains('selected');
 			console.log("Selected button data column:", column); // Print the selected button's data column
-            updateGraph("all","all", [], column, yoy); // Initial state as "all" and no year filter
+			const selectedYears = Array.from(document.querySelectorAll('#year-checkboxes input:checked')).map(cb => +cb.value);
+            updateGraph("all","all", selectedYears, column, yoy); // Initial state as "all" and no year filter
         });
     });
 
@@ -84,7 +85,8 @@ document.addEventListener("DOMContentLoaded", function() {
         const yoy = this.classList.contains('active');
         const column = document.querySelector('.plot-btn.selected').getAttribute('data-column');
         console.log("Toggle sequence:", yoy); // Print the toggle state
-        updateGraph("all", "all", [], column, yoy); // Initial state as "all" and no year filter
+		const selectedYears = Array.from(document.querySelectorAll('#year-checkboxes input:checked')).map(cb => +cb.value);
+        updateGraph("all", "all", selectedYears, column, yoy); // Initial state as "all" and no year filter
     });
 
 	document.getElementById("submit-btn").addEventListener("click", function() {
@@ -186,6 +188,64 @@ document.addEventListener("DOMContentLoaded", function() {
 				chartGroup.append("g")
 					.attr("transform", `translate(0,${height})`)
 					.call(d3.axisBottom(x).tickValues([]));
+
+
+				// Define the date for the vertical line
+				const verticalLineDate1 = new Date("2020-02-01");				
+				const verticalLineDate2 = new Date("2022-05-01");				
+				
+				// Define the annotations
+				const annotations = [{
+					note: { 
+						label: "Start of COVID-19 pandemic",
+						title: ""
+					},
+					x: null, // Will be set later based on x-axis scale
+					y: 400, // Set appropriate y-coordinate
+					dy: 10,
+					dx: 50
+				},
+				{
+					note: { 
+						label: "Start of Interest Rate Increase",
+						title: ""
+					},
+					x: null, // Will be set later based on x-axis scale
+					y: 400, // Set appropriate y-coordinate
+					dy: 10,
+					dx: 80
+				}];
+
+				chartGroup.append("line")
+					.attr("x1", x(verticalLineDate1))
+					.attr("x2", x(verticalLineDate1))
+					.attr("y1", 0)
+					.attr("y2", height)
+					.attr("stroke", "grey")
+					.attr("stroke-width", 2)
+					.attr("stroke-dasharray", "4");
+
+					chartGroup.append("line")
+					.attr("x1", x(verticalLineDate2))
+					.attr("x2", x(verticalLineDate2))
+					.attr("y1", 0)
+					.attr("y2", height)
+					.attr("stroke", "grey")
+					.attr("stroke-width", 2)
+					.attr("stroke-dasharray", "4");
+
+
+				// Add annotations
+                annotations[0].x = x(verticalLineDate1);
+                annotations[1].x = x(verticalLineDate2);
+
+				const makeAnnotations = d3.annotation()
+                    .type(d3.annotationLabel)
+                    .annotations(annotations);
+
+                chartGroup.append("g")
+                    .attr("class", "annotation-group")
+                    .call(makeAnnotations);	
 			}
 
            
@@ -202,12 +262,12 @@ document.addEventListener("DOMContentLoaded", function() {
             // Add y-axis label
             chartGroup.append("text")
             .attr("transform", "rotate(-90)")
-            .attr("y", 0 - 1.5*margin.left)
+            .attr("y", 0 - 2*margin.left)
             .attr("x", 0 - (height / 2))
             .attr("dy", "1em")
             .style("text-anchor", "middle")
             .style("font-size", "16px")
-            .text(`Median ${column.replace('_', ' ')}`);
+            .text(`${column.replace('_', ' ')}`);
 
             chartGroup.append("text")
             .attr("x", width / 2)
@@ -247,7 +307,7 @@ document.addEventListener("DOMContentLoaded", function() {
 					tooltip.transition()
 						.duration(200)
 						.style("opacity", .9);
-					tooltip.html(`Date: ${d3.timeFormat("%b %d, %Y")(d.month)}<br>Median ${column.replace('_', ' ')}: ${d.value}`)
+					tooltip.html(`Date: ${d3.timeFormat("%b %d, %Y")(d.month)}<br> ${column.replace('_', ' ')}: ${d.value}`)
                         .style("left", (event.pageX + 5) + "px")
 						.style("top", (event.pageY - 28) + "px");
 				})

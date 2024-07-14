@@ -81,7 +81,7 @@
     </div>
 
     <div class="toggle-container">
-        <span class="toggle-label">Toggle Sequence:</span>
+        <span class="toggle-label">Year over Year Comparison</span>
         <div id="toggle-sequence" class="toggle-switch"></div>
     </div>
 
@@ -147,7 +147,6 @@
         <label for="home-type-select">Choose a Home Type:</label>
         <select id="home-type-select">
             <option value="all">All Types</option>
-            <option value="Single Family">Single Family</option>
             <option value="Condo/Co-op">Condo/Co-op</option>
             <option value="Multi-Family (2-4 Unit)">Multi-Family (2-4 Unit)</option>
             <option value="Single Family Residential">Single Family Residential</option>
@@ -161,11 +160,11 @@
     </div>
 
     <div id="year-checkboxes">
-        <label><input type="checkbox" value="2020">2020</label>
-        <label><input type="checkbox" value="2021">2021</label>
-        <label><input type="checkbox" value="2022">2022</label>
-        <label><input type="checkbox" value="2023">2023</label>
-        <label><input type="checkbox" value="2024">2024</label>
+        <label><input type="checkbox" value="2020" checked="true">2020</label>
+        <label><input type="checkbox" value="2021" checked="true">2021</label>
+        <label><input type="checkbox" value="2022" checked="true">2022</label>
+        <label><input type="checkbox" value="2023" checked="true">2023</label>
+        <label><input type="checkbox" value="2024" checked="true">2024</label>
 
         <!-- Add other years as needed -->
     </div>
@@ -174,8 +173,8 @@
 
 
     <script src="https://d3js.org/d3.v7.min.js"></script>
-    <script src="https://unpkg.com/d3-annotation@2.5.1/dist/d3-annotation.min.js"></script>
-    <script src="https://d3js.org/topojson.v3.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3-annotation/2.5.1/d3-annotation.min.js"></script>
+    <!-- <script src="https://d3js.org/topojson.v3.min.js"></script> -->
     <script src="script.js"></script>
 </body>
 </html>
