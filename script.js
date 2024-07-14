@@ -72,9 +72,19 @@ document.addEventListener("DOMContentLoaded", function() {
 			document.querySelectorAll('.plot-btn').forEach(btn => btn.classList.remove('selected'));
             this.classList.add('selected');
             const column = this.getAttribute('data-column');
+			const yoy = document.querySelector('#toggle-sequence').classList.contains('selected');
 			console.log("Selected button data column:", column); // Print the selected button's data column
-            updateGraph("all","all", [], column); // Initial state as "all" and no year filter
+            updateGraph("all","all", [], column, yoy); // Initial state as "all" and no year filter
         });
+    });
+
+	 // Event listener for toggle button
+	 document.getElementById('toggle-sequence').addEventListener('click', function() {
+        this.classList.toggle('active');
+        const yoy = this.classList.contains('active');
+        const column = document.querySelector('.plot-btn.selected').getAttribute('data-column');
+        console.log("Toggle sequence:", yoy); // Print the toggle state
+        updateGraph("all", "all", [], column, yoy); // Initial state as "all" and no year filter
     });
 
 	document.getElementById("submit-btn").addEventListener("click", function() {
@@ -82,11 +92,13 @@ document.addEventListener("DOMContentLoaded", function() {
 		const selectedHome = document.getElementById("home-type-select").value;
 		const selectedYears = Array.from(document.querySelectorAll('#year-checkboxes input:checked')).map(cb => +cb.value);
 		const column = document.querySelector('.plot-btn.selected').getAttribute('data-column'); // Get the selected column
-		updateGraph(selectedState, selectedHome, selectedYears, column);
+		const yoy = document.getElementById('toggle-sequence').classList.contains('active');
+
+		updateGraph(selectedState, selectedHome, selectedYears, column, yoy);
 	});
 
 	// Function to update the graph based on selected state
-	function updateGraph(state, home_type, years, column) {
+	function updateGraph(state, home_type, years, column, yoy) {
 		let filteredData = allData;
 
         // console.log("Initial filteredData count:", filteredData.length);
@@ -157,7 +169,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
 			// X axis
 			const x = d3.scaleTime().range([0, width-40]);
-			if (column === "homes_sold") {
+			if (yoy === true) {
                 x.domain([new Date(year, 0), new Date(year, 11)]);
 
 				if ( count == 0 )
@@ -272,7 +284,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
 	}
 	// Initial graph with all states
-	updateGraph("all", "all", [], "homes_sold");
+	updateGraph("all", "all", [], "homes_sold", false);
 
 
 });
