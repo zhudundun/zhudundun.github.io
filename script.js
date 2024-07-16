@@ -3,7 +3,7 @@ document.addEventListener("DOMContentLoaded", function() {
 	// Set the dimensions and margins of the graph
 	const margin = {
 			top: 20,
-			right: 30,
+			right: 20,
 			bottom: 60,
 			left: 40
 		},
@@ -28,7 +28,30 @@ document.addEventListener("DOMContentLoaded", function() {
     .attr("y", 0)
     .attr("text-anchor", "middle")  
     .style("font-size", "24px") 
-    .text("Post Pandemic Era Housing Market");
+    .text("Housing Market Trends in the Post-Pandemic Era");
+
+	// Append description paragraph
+    const descriptionText = svg.append("text")
+        .attr("x", (width ))
+        .attr("y", 30) // Adjust the y position to place it below the title
+        .attr("class", "description-text")
+        .attr("text-anchor", "middle");
+
+	descriptionText.append("tspan")
+        .attr("x", (width / 2))
+        .attr("dy", "1.2em")
+        .text("This chart illustrates the housing market trends in the post-pandemic era, divided into two distinct periods. ");
+
+	descriptionText.append("tspan")
+        .attr("x", (width / 2))
+        .attr("dy", "1.2em")
+        .text(" In the first period, the housing market heated up significantly, with single-family homes in particular experiencing a surge in demand as a direct impact of COVID-19. ");
+	
+	descriptionText.append("tspan")
+        .attr("x", (width / 2))
+        .attr("dy", "1.2em")
+        .text("In the second period, the market has been cooling down due to rising mortgage rates, a secondary effect of the economic policies implemented during the pandemic.");
+
 
 
 	// Append a tooltip div to the body
@@ -102,6 +125,7 @@ document.addEventListener("DOMContentLoaded", function() {
 	// Function to update the graph based on selected state
 	function updateGraph(state, home_type, years, column, yoy) {
 		let filteredData = allData;
+		const chart_top_margin = 100;
 
         // console.log("Initial filteredData count:", filteredData.length);
 
@@ -149,6 +173,7 @@ document.addEventListener("DOMContentLoaded", function() {
             medianDataArray.push(...medianData);
         })
         const maxMedianValue = d3.max(medianDataArray, d => d.value);
+        const minMedianValue = d3.min(medianDataArray, d => d.value);
 
 
 		years.forEach(year => {
@@ -200,8 +225,8 @@ document.addEventListener("DOMContentLoaded", function() {
 						label: "Start of COVID-19 pandemic",
 						title: ""
 					},
-					x: null, // Will be set later based on x-axis scale
-					y: 400, // Set appropriate y-coordinate
+					x: -1000, // Will be set later based on x-axis scale
+					y: 100, // Set appropriate y-coordinate
 					dy: 10,
 					dx: 50
 				},
@@ -210,34 +235,37 @@ document.addEventListener("DOMContentLoaded", function() {
 						label: "Start of Interest Rate Increase",
 						title: ""
 					},
-					x: null, // Will be set later based on x-axis scale
-					y: 400, // Set appropriate y-coordinate
+					x: -1000, // Will be set later based on x-axis scale
+					y: 100, // Set appropriate y-coordinate
 					dy: 10,
 					dx: 80
 				}];
 
-				chartGroup.append("line")
-					.attr("x1", x(verticalLineDate1))
-					.attr("x2", x(verticalLineDate1))
-					.attr("y1", 0)
-					.attr("y2", height)
-					.attr("stroke", "grey")
-					.attr("stroke-width", 2)
-					.attr("stroke-dasharray", "4");
-
+				if (year === 2020) {
 					chartGroup.append("line")
-					.attr("x1", x(verticalLineDate2))
-					.attr("x2", x(verticalLineDate2))
-					.attr("y1", 0)
-					.attr("y2", height)
-					.attr("stroke", "grey")
-					.attr("stroke-width", 2)
-					.attr("stroke-dasharray", "4");
+						.attr("x1", x(verticalLineDate1))
+						.attr("x2", x(verticalLineDate1))
+						.attr("y1", chart_top_margin)
+						.attr("y2", height)
+						.attr("stroke", "grey")
+						.attr("stroke-width", 2)
+						.attr("stroke-dasharray", "4");
 
+					annotations[0].x = x(verticalLineDate1);
+				}
 
-				// Add annotations
-                annotations[0].x = x(verticalLineDate1);
-                annotations[1].x = x(verticalLineDate2);
+				if (year === 2022) {
+					chartGroup.append("line")
+						.attr("x1", x(verticalLineDate2))
+						.attr("x2", x(verticalLineDate2))
+						.attr("y1", chart_top_margin)
+						.attr("y2", height)
+						.attr("stroke", "grey")
+						.attr("stroke-width", 2)
+						.attr("stroke-dasharray", "4");
+
+					annotations[1].x = x(verticalLineDate2);
+				}
 
 				const makeAnnotations = d3.annotation()
                     .type(d3.annotationLabel)
@@ -254,8 +282,8 @@ document.addEventListener("DOMContentLoaded", function() {
             // Y axis
             
             const y = d3.scaleLinear()
-                .domain([0, maxMedianValue])
-                .range([height, 0]);
+                .domain([minMedianValue, maxMedianValue])
+                .range([height, chart_top_margin]);
             chartGroup.append("g")
                 .call(d3.axisLeft(y));
 
@@ -323,11 +351,11 @@ document.addEventListener("DOMContentLoaded", function() {
 	// Add legend
 	const legend = chartGroup.append("g")
 		.attr("class", "legend")
-		.attr("transform", `translate(${margin.left-400}, ${margin.top -20})`)
+		.attr("transform", `translate(${margin.left-400}, ${margin.bottom+400 })`)
 		.selectAll("g")
 		.data(years)
 		.enter().append("g")
-		.attr("transform", (d, i) => `translate(${i * 80},0)`);
+		.attr("transform", (d, i) => `translate(${i * 65},0)`);
 
 	legend.append("rect")
 		.attr("x", width - 18)

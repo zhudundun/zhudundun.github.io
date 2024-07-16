@@ -9,14 +9,14 @@
     <style>
         /* Add your CSS styles here */
         #chart {
-            margin-top: 10px;
+            margin-top: -30px;
         }
         .legend rect {
             stroke-width: 2;
             stroke: black;
         }
         .button-container {
-            margin-bottom: 20px;
+            margin-bottom: 10px;
         }
         .plot-btn {
             background-color: #f0f0f0;
@@ -69,6 +69,13 @@
         }
         .toggle-switch.active::before {
             transform: translateX(25px);
+        }
+        .description-text {
+            font-size: 14px;
+            fill: #333;
+            width: 100%;
+            text-align: center;
+            transform: translateY(-10px); /* Adjust to move the text up or down */
         }
     </style>
     
@@ -160,6 +167,7 @@
     </div>
 
     <div id="year-checkboxes">
+        <label><input type="checkbox" value="2019" checked="true">2019</label>
         <label><input type="checkbox" value="2020" checked="true">2020</label>
         <label><input type="checkbox" value="2021" checked="true">2021</label>
         <label><input type="checkbox" value="2022" checked="true">2022</label>
@@ -174,7 +182,6 @@
 
     <script src="https://d3js.org/d3.v7.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/d3-annotation/2.5.1/d3-annotation.min.js"></script>
-    <!-- <script src="https://d3js.org/topojson.v3.min.js"></script> -->
     <script src="script.js"></script>
 </body>
 </html>
