@@ -42,25 +42,27 @@ document.addEventListener("DOMContentLoaded", function() {
 
 	// Append description paragraph
     const descriptionText = svg.append("text")
-        .attr("x", (width ))
-        .attr("y", 30) // Adjust the y position to place it below the title
+        .attr("x", (width/2 ))
+        .attr("y", 50) // Adjust the y position to place it below the title
         .attr("class", "description-text")
-        .attr("text-anchor", "middle");
+        .attr("text-anchor", "middle")
+		.style("font-size", "16px")
+		.text("This chart illustrates the housing market trends in the post-pandemic era");
 
-	descriptionText.append("tspan")
-        .attr("x", (width / 2))
-        .attr("dy", "1.2em")
-        .text("This chart illustrates the housing market trends in the post-pandemic era, divided into two distinct periods. ");
+	// descriptionText.append("tspan")
+    //     .attr("x", (width / 2))
+    //     .attr("dy", "1.2em")
+    //     .text("This chart illustrates the housing market trends in the post-pandemic era, divided into two distinct periods. ");
 
-	descriptionText.append("tspan")
-        .attr("x", (width / 2))
-        .attr("dy", "1.2em")
-        .text(" In the first period, the housing market heated up significantly, with single-family homes in particular experiencing a surge in demand as a direct impact of COVID-19. ");
+	// descriptionText.append("tspan")
+    //     .attr("x", (width / 2))
+    //     .attr("dy", "1.2em")
+    //     .text(" In the first period, the housing market heated up significantly, with single-family homes in particular experiencing a surge in demand as a direct impact of COVID-19. ");
 	
-	descriptionText.append("tspan")
-        .attr("x", (width / 2))
-        .attr("dy", "1.2em")
-        .text("In the second period, the market has been cooling down due to rising mortgage rates, a secondary effect of the economic policies implemented during the pandemic.");
+	// descriptionText.append("tspan")
+    //     .attr("x", (width / 2))
+    //     .attr("dy", "1.2em")
+    //     .text("In the second period, the market has been cooling down due to rising mortgage rates, a secondary effect of the economic policies implemented during the pandemic.");
 
 
 
@@ -137,16 +139,37 @@ document.addEventListener("DOMContentLoaded", function() {
 		let filteredData = allData;
 		const chart_top_margin = 100;
 
+		// Define the date for the vertical line
+		const verticalLineDate1 = new Date("2020-02-01");				
+		const verticalLineDate2 = new Date("2022-05-01");				
+		
+		// Define the annotations
+		var annotations = [{
+			note: { 
+				label: "Start of COVID-19 pandemic",
+				title: ""
+			},
+			x: -1000, // Will be set later based on x-axis scale
+			y: 100, // Set appropriate y-coordinate
+			dy: 10,
+			dx: 50
+		},
+		{
+			note: { 
+				label: "Start of Interest Rate Increase",
+				title: ""
+			},
+			x: -1000, // Will be set later based on x-axis scale
+			y: 100, // Set appropriate y-coordinate
+			dy: 10,
+			dx: 80
+		}];
+
+		
+
         // console.log("Initial filteredData count:", filteredData.length);
 
-		// Update subtitle
-        if (column === 'homes_sold') {
-			subtitle.text(`Currently showing: Number of Homes Sold`);
-		} else if (column === 'median_dom') { 
-			subtitle.text(`Currently showing: Median Days on the Market`);
-		} else {
-			subtitle.text(`Currently showing: Median Sale Price`);
-		}
+		
 
 
 		if (state !== "all") {
@@ -164,6 +187,78 @@ document.addEventListener("DOMContentLoaded", function() {
 		// Clear previous SVG contents
 		chartGroup.selectAll("*").remove();
 
+		
+
+		// Update subtitle
+        if (column === 'homes_sold') {
+			subtitle.text(`Currently showing: Number of Homes Sold`);
+			descriptionText.text(`Increasing rates help bring the market back to more typical levels of activity and pricing.Yet, rising interest rates exacerbate other issues like affordability.`);
+			if (state==='all' && home_type==='all') {annotations.push(
+				{
+				  note: { label: "After 4 years in pandemic, the housing market is finally normalized to a state close to 2019" },
+				  x: 1000,
+				  y: 380,
+				  dy: -20,
+				  dx: 10,
+				  subject: { radius: 50, radiusPadding: 10 },
+				},
+			);}
+			  
+			//   d3.annotation().annotations(annotationsColumn);
+		} else if (column === 'median_dom') { 
+			subtitle.text(`Currently showing: Median Days on the Market`);
+			descriptionText.text(`With more people working remotely, there was a surge in demand for larger homes with home offices and outdoor spaces.`);
+			if (state==='all' && home_type==='all') {annotations.push(
+				{
+				  note: { label: "2nd half of 2020, days on market didn't follow seasonal trend and the demand is high" },
+				  x: 350,
+				  y: 340,
+				  dy: 40,
+				  dx: 30,
+				  subject: { radius: 50, radiusPadding: 10 },
+				},
+			);}
+		} else if (column === 'inventory') {
+			subtitle.text(`Currently showing: Inventory`);
+			descriptionText.text(`The pandemic caused delays in construction due to lockdowns, labor shortages, and supply chain disruptions. This exacerbated the already low housing inventory`);
+			if (state==='all' && home_type==='all') {annotations.push(
+				{
+				  note: { label: "2 years into pandemic, inventory reaches lowest point" },
+				  x: 580,
+				  y: 500,
+				  dy: -10,
+				  dx: -50,
+				  subject: { radius: 50, radiusPadding: 10 },
+				},
+			);}
+		} else if (column === 'price_drops') {
+			subtitle.text(`Currently showing: Price Drops`);
+			descriptionText.text(`Higher interest rates typically lead to a decrease in housing demand. With more expensive mortgages, fewer people are willing or able to purchase homes.`);
+			if (state==='all' && home_type==='all') {annotations.push(
+				{
+				  note: { label: "interest rate increase effectively lowers housing price and cools the demand" },
+				  x: 750,
+				  y: 170,
+				  dy: 170,
+				  dx: 5,
+				  subject: { radius: 50, radiusPadding: 10 },
+				},
+			);}
+		}  else {
+			subtitle.text(`Currently showing: Median Sale Price`);
+			descriptionText.text(`The increased demand for housing, coupled with low inventory, led to a significant rise in home prices.`);
+			if (state==='all' && home_type==='all') {annotations.push(
+				{
+				  note: { label: "The sale price experienced the fastest growth rate between the onset of the pandemic and the subsequent increase in interest rates" },
+				  x: 580,
+				  y: 300,
+				  dy: 10,
+				  dx: 10,
+				  subject: { radius: 50, radiusPadding: 10 },
+				},
+			);}
+
+		}
 
 
 		
@@ -233,57 +328,33 @@ document.addEventListener("DOMContentLoaded", function() {
 					.call(d3.axisBottom(x).tickValues([]));
 
 
-				// Define the date for the vertical line
-				const verticalLineDate1 = new Date("2020-02-01");				
-				const verticalLineDate2 = new Date("2022-05-01");				
 				
-				// Define the annotations
-				const annotations = [{
-					note: { 
-						label: "Start of COVID-19 pandemic",
-						title: ""
-					},
-					x: -1000, // Will be set later based on x-axis scale
-					y: 100, // Set appropriate y-coordinate
-					dy: 10,
-					dx: 50
-				},
-				{
-					note: { 
-						label: "Start of Interest Rate Increase",
-						title: ""
-					},
-					x: -1000, // Will be set later based on x-axis scale
-					y: 100, // Set appropriate y-coordinate
-					dy: 10,
-					dx: 80
-				}];
 
-				if (year === 2020) {
-					chartGroup.append("line")
-						.attr("x1", x(verticalLineDate1))
-						.attr("x2", x(verticalLineDate1))
-						.attr("y1", chart_top_margin)
-						.attr("y2", height)
-						.attr("stroke", "grey")
-						.attr("stroke-width", 2)
-						.attr("stroke-dasharray", "4");
+				// if (year === 2020) {
+				chartGroup.append("line")
+					.attr("x1", x(verticalLineDate1))
+					.attr("x2", x(verticalLineDate1))
+					.attr("y1", chart_top_margin)
+					.attr("y2", height)
+					.attr("stroke", "grey")
+					.attr("stroke-width", 2)
+					.attr("stroke-dasharray", "4");
 
-					annotations[0].x = x(verticalLineDate1);
-				}
+				annotations[0].x = x(verticalLineDate1);
+				// }
 
-				if (year === 2022) {
-					chartGroup.append("line")
-						.attr("x1", x(verticalLineDate2))
-						.attr("x2", x(verticalLineDate2))
-						.attr("y1", chart_top_margin)
-						.attr("y2", height)
-						.attr("stroke", "grey")
-						.attr("stroke-width", 2)
-						.attr("stroke-dasharray", "4");
+				// if (year === 2022) {
+				chartGroup.append("line")
+					.attr("x1", x(verticalLineDate2))
+					.attr("x2", x(verticalLineDate2))
+					.attr("y1", chart_top_margin)
+					.attr("y2", height)
+					.attr("stroke", "grey")
+					.attr("stroke-width", 2)
+					.attr("stroke-dasharray", "4");
 
-					annotations[1].x = x(verticalLineDate2);
-				}
+				annotations[1].x = x(verticalLineDate2);
+				// }
 
 				const makeAnnotations = d3.annotation()
                     .type(d3.annotationLabel)
@@ -347,12 +418,13 @@ document.addEventListener("DOMContentLoaded", function() {
 				.attr("class", `data-point-${year}`)
 				.attr("cx", d => x(d.month))
                 .attr("cy", d => y(d.value))
-				.attr("r", 4)
+				.attr("r", 5)
 				.attr("fill", color(year))
+				.style("opacity", .5)
 				.on("mouseover", (event, d) => {
 					tooltip.transition()
 						.duration(200)
-						.style("opacity", .9);
+						.style("opacity", .7);
 					tooltip.html(`Date: ${d3.timeFormat("%b %d, %Y")(d.month)}<br> ${column.replace('_', ' ')}: ${d.value}`)
                         .style("left", (event.pageX + 5) + "px")
 						.style("top", (event.pageY - 28) + "px");
@@ -379,7 +451,8 @@ document.addEventListener("DOMContentLoaded", function() {
 		.attr("x", width - 18)
 		.attr("width", 18)
 		.attr("height", 18)
-		.attr("fill", color);
+		.attr("fill", color)
+		.style("opacity", .7);
 
 	legend.append("text")
 		.attr("x", width - 24)
