@@ -30,6 +30,16 @@ document.addEventListener("DOMContentLoaded", function() {
     .style("font-size", "24px") 
     .text("Housing Market Trends in the Post-Pandemic Era");
 
+	// Add a subtitle to display the current plot
+    const subtitle = svg.append("text")
+        .attr("x", (width / 2))
+        .attr("y", 100) // Adjust the y position to place it below the title
+        .attr("class", "subtitle-text")
+        .attr("text-anchor", "middle")
+        .style("font-size", "16px")
+        .text("");
+
+
 	// Append description paragraph
     const descriptionText = svg.append("text")
         .attr("x", (width ))
@@ -129,6 +139,14 @@ document.addEventListener("DOMContentLoaded", function() {
 
         // console.log("Initial filteredData count:", filteredData.length);
 
+		// Update subtitle
+        if (column === 'homes_sold') {
+			subtitle.text(`Currently showing: Number of Homes Sold`);
+		} else if (column === 'median_dom') { 
+			subtitle.text(`Currently showing: Median Days on the Market`);
+		} else {
+			subtitle.text(`Currently showing: Median Sale Price`);
+		}
 
 
 		if (state !== "all") {
@@ -372,7 +390,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
 	}
 	// Initial graph with all states
-	updateGraph("all", "all", [], "homes_sold", false);
+	// updateGraph("all", "all", [], "homes_sold", false);
 
 
 });
