@@ -111,6 +111,21 @@ document.addEventListener("DOMContentLoaded", function() {
 			console.log("Selected button data column:", column); // Print the selected button's data column
 			// const selectedYears = Array.from(document.querySelectorAll('#year-checkboxes input:checked')).map(cb => +cb.value);
 			const selectedYears = [2019, 2020, 2021, 2022, 2023, 2024];
+
+			// Turn off the toggle switch
+            const toggleSwitch = document.getElementById('toggle-sequence');
+            toggleSwitch.classList.remove('active');
+            const sequence = false;
+
+
+			// Reset the state drop-down to "all"
+            const stateSelect = document.getElementById('state-select');
+            stateSelect.value = "all";
+
+			// Reset the state drop-down to "all"
+            const typeSelect = document.getElementById('home-type-select');
+            typeSelect.value = "all";
+
             updateGraph("all","all", selectedYears, column, yoy); // Initial state as "all" and no year filter
         });
     });
