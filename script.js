@@ -109,7 +109,8 @@ document.addEventListener("DOMContentLoaded", function() {
             const column = this.getAttribute('data-column');
 			const yoy = document.querySelector('#toggle-sequence').classList.contains('selected');
 			console.log("Selected button data column:", column); // Print the selected button's data column
-			const selectedYears = Array.from(document.querySelectorAll('#year-checkboxes input:checked')).map(cb => +cb.value);
+			// const selectedYears = Array.from(document.querySelectorAll('#year-checkboxes input:checked')).map(cb => +cb.value);
+			const selectedYears = [2019, 2020, 2021, 2022, 2023, 2024];
             updateGraph("all","all", selectedYears, column, yoy); // Initial state as "all" and no year filter
         });
     });
@@ -120,14 +121,16 @@ document.addEventListener("DOMContentLoaded", function() {
         const yoy = this.classList.contains('active');
         const column = document.querySelector('.plot-btn.selected').getAttribute('data-column');
         console.log("Toggle sequence:", yoy); // Print the toggle state
-		const selectedYears = Array.from(document.querySelectorAll('#year-checkboxes input:checked')).map(cb => +cb.value);
+		// const selectedYears = Array.from(document.querySelectorAll('#year-checkboxes input:checked')).map(cb => +cb.value);
+		const selectedYears = [2019, 2020, 2021, 2022, 2023, 2024];
         updateGraph("all", "all", selectedYears, column, yoy); // Initial state as "all" and no year filter
     });
 
 	document.getElementById("submit-btn").addEventListener("click", function() {
 		const selectedState = document.getElementById("state-select").value;
 		const selectedHome = document.getElementById("home-type-select").value;
-		const selectedYears = Array.from(document.querySelectorAll('#year-checkboxes input:checked')).map(cb => +cb.value);
+		// const selectedYears = Array.from(document.querySelectorAll('#year-checkboxes input:checked')).map(cb => +cb.value);
+		const selectedYears = [2019, 2020, 2021, 2022, 2023, 2024];
 		const column = document.querySelector('.plot-btn.selected').getAttribute('data-column'); // Get the selected column
 		const yoy = document.getElementById('toggle-sequence').classList.contains('active');
 
