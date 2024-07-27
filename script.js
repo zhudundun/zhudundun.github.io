@@ -78,6 +78,8 @@ document.addEventListener("DOMContentLoaded", function() {
 		.style("opacity", 0);
 
 	let allData;
+	let currentPlotIndex = -1; // Track the current plot button index
+
 
 
 
@@ -102,7 +104,10 @@ document.addEventListener("DOMContentLoaded", function() {
 	});
 
 	// Event listener for plot buttons
-    document.querySelectorAll('.plot-btn').forEach(button => {
+
+	const plotButtons = document.querySelectorAll('.plot-btn');
+
+    plotButtons.forEach(button => {
         button.addEventListener('click', function() {
 			document.querySelectorAll('.plot-btn').forEach(btn => btn.classList.remove('selected'));
             this.classList.add('selected');
@@ -141,7 +146,9 @@ document.addEventListener("DOMContentLoaded", function() {
         updateGraph("all", "all", selectedYears, column, yoy); // Initial state as "all" and no year filter
     });
 
-	document.getElementById("submit-btn").addEventListener("click", function() {
+	
+
+	document.getElementById('submit-btn').addEventListener("click", function() {
 		const selectedState = document.getElementById("state-select").value;
 		const selectedHome = document.getElementById("home-type-select").value;
 		// const selectedYears = Array.from(document.querySelectorAll('#year-checkboxes input:checked')).map(cb => +cb.value);
@@ -151,6 +158,18 @@ document.addEventListener("DOMContentLoaded", function() {
 
 		updateGraph(selectedState, selectedHome, selectedYears, column, yoy);
 	});
+
+	// Event listener for the next scene button
+	document.getElementById('next-scene-btn').addEventListener('click', function() {
+		// Find the next plot button to simulate click
+		 // Increment the plot button index
+		 currentPlotIndex = (currentPlotIndex + 1) % plotButtons.length;
+		 plotButtons[currentPlotIndex].click(); // Simulate click on the next plot button
+	});
+
+	
+
+	
 
 	// Function to update the graph based on selected state
 	function updateGraph(state, home_type, years, column, yoy) {
@@ -282,7 +301,8 @@ document.addEventListener("DOMContentLoaded", function() {
 		
 
 		// Color scale
-		const color = d3.scaleOrdinal(d3.schemeCategory10).domain(years);
+		const color = d3.scaleOrdinal(d3.schemeCategory10)
+		.domain(years);
 
         const medianDataArray = [];
 
@@ -426,7 +446,17 @@ document.addEventListener("DOMContentLoaded", function() {
 				.attr("fill", "none")
 				.attr("stroke", color(year))
 				.attr("stroke-width", 2)
-				.attr("d", line);
+				.attr("d", line)
+				.attr("stroke-dasharray", function() {
+					const totalLength = this.getTotalLength();
+					return totalLength + " " + totalLength;
+				})
+				.attr("stroke-dashoffset", function() {
+					return this.getTotalLength();
+				})
+				.transition()
+				.duration(2000)
+				.attr("stroke-dashoffset", 0);
 
 			// Append circles to each data point
 			chartGroup.selectAll(`.data-point-${year}`)

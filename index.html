@@ -81,6 +81,9 @@
     
 </head>
 <body>
+    <button id="next-scene-btn" class="plot-btn">Next</button>
+
+
     <div class="button-container">
         
         <button class="plot-btn" data-column="median_dom">1</button>
@@ -95,6 +98,7 @@
         <span class="toggle-label">Year over Year Comparison</span>
         <div id="toggle-sequence" class="toggle-switch"></div>
     </div>
+
 
 
     <div id="chart"></div>
@@ -179,7 +183,8 @@
         <label><input type="checkbox" value="2024" checked="true">2024</label>
     </div> -->
 
-    <button id="submit-btn">Submit</button>
+    <button id="submit-btn" style="cursor: pointer;" title="Submit to zoom in on the selected segment">Submit</button>
+
 
 
     <script src="https://d3js.org/d3.v7.min.js"></script>
