@@ -47,7 +47,7 @@ document.addEventListener("DOMContentLoaded", function() {
         .attr("class", "description-text")
         .attr("text-anchor", "middle")
 		.style("font-size", "16px")
-		.text("This chart illustrates the housing market trends in the post-pandemic era");
+		.text("This chart illustrates how the pandemic reshaped the U.S. housing market");
 
 	// descriptionText.append("tspan")
     //     .attr("x", (width / 2))
@@ -103,9 +103,22 @@ document.addEventListener("DOMContentLoaded", function() {
 
 	});
 
+	
+	
+	// Function to get the index of the plot button based on data-column
+    function getPlotButtonIndex(dataColumn) {
+        const plotButtons = document.querySelectorAll('.plot-btn');
+        for (let i = 0; i < plotButtons.length; i++) {
+            if (plotButtons[i].getAttribute('data-column') === dataColumn) {
+                return i;
+            }
+        }
+        return -1; // Return -1 if not found
+    }
+	
 	// Event listener for plot buttons
-
 	const plotButtons = document.querySelectorAll('.plot-btn');
+
 
     plotButtons.forEach(button => {
         button.addEventListener('click', function() {
@@ -116,6 +129,28 @@ document.addEventListener("DOMContentLoaded", function() {
 			console.log("Selected button data column:", column); // Print the selected button's data column
 			// const selectedYears = Array.from(document.querySelectorAll('#year-checkboxes input:checked')).map(cb => +cb.value);
 			const selectedYears = [2019, 2020, 2021, 2022, 2023, 2024];
+
+			if (column === null)
+			{
+				// return if no column is selected
+				return;
+			}
+
+			currentPlotIndex = getPlotButtonIndex(column); 
+			console.log("currentPlotIndex:", currentPlotIndex);
+
+			// currentPlotButton = this.getAttribute('data-column');
+
+
+			// highlightYear = currentPlotButton === "homes_sold" ? 2024 : 2023;
+
+			// if (currentPlotButton === "median_dom") {highlightYear = 2019;}
+			// if (currentPlotButton === "inventory") {highlightYear = 2020;}
+			// if (currentPlotButton === "median_sale_price") {highlightYear = 2021;}
+			// if (currentPlotButton === "price_drops") {highlightYear = 2022;}
+			// if (currentPlotButton === "homes_sold") {highlightYear = 2023;}
+
+
 
 			// Turn off the toggle switch
             const toggleSwitch = document.getElementById('toggle-sequence');
@@ -164,6 +199,7 @@ document.addEventListener("DOMContentLoaded", function() {
 		// Find the next plot button to simulate click
 		 // Increment the plot button index
 		 currentPlotIndex = (currentPlotIndex + 1) % plotButtons.length;
+		 console.log("next:", currentPlotIndex);
 		 plotButtons[currentPlotIndex].click(); // Simulate click on the next plot button
 	});
 
@@ -229,7 +265,7 @@ document.addEventListener("DOMContentLoaded", function() {
 		// Update subtitle
         if (column === 'homes_sold') {
 			subtitle.text(`Currently showing: Number of Homes Sold`);
-			descriptionText.text(`Increasing rates help bring the market back to more typical levels of activity and pricing.Yet, rising interest rates exacerbate other issues like affordability.`);
+			descriptionText.text(`Though affordability is still an issue, increasing rates help bring the market back to more typical levels of activity and pricing.`);
 			if (state==='all' && home_type==='all') {annotations.push(
 				{
 				  note: { label: "After 4 years in pandemic, the housing market is finally normalized to a state close to 2019" },
@@ -303,6 +339,8 @@ document.addEventListener("DOMContentLoaded", function() {
 		// Color scale
 		const color = d3.scaleOrdinal(d3.schemeCategory10)
 		.domain(years);
+		// .range(years.map(year => year === highlightYear ? d3.schemeCategory10[0] : '#d3d3d3'))
+		
 
         const medianDataArray = [];
 
